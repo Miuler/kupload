@@ -1,0 +1,17 @@
+# USAGE:
+# cargo install cargo-make
+# cargo make buildimage
+
+[tasks.buildstandalone]
+script = '''
+RUSTFLAGS='-C target-feature=+crt-static' cargo build --release --target x86_64-unknown-linux-gnu
+'''
+
+[tasks.buildimage]
+dependencies = ["buildstandalone"]
+script = '''
+mkdir -p ./target/release/devops
+cp ./target/x86_64-unknown-linux-gnu/release/kupload ./target/release/devops/
+
+docker build -t kupload -f devops/Dockerfile ./target/release/devops
+'''
